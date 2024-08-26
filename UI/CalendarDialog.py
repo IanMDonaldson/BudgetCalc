@@ -2,7 +2,6 @@ import tkinter
 from datetime import datetime, date
 import tkcalendar
 import tkinter.simpledialog as simpledialog
-from Utils import ParserUtils
 
 class CalendarDialog(simpledialog.Dialog):
     """Dialog box that displays a calendar and returns the selected date"""

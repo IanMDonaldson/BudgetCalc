@@ -34,11 +34,11 @@ def insert_classifications(classifications):
     return result
 
 
-def insert_classification(classification):
+def insert_classification(classification_name, transaction_description):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     cur.execute("INSERT into Classification (classification, trans_description)"
-                "VALUES (?, ?) RETURNING *", ( classification[1], classification[2]))
+                "VALUES (?, ?) RETURNING *", (classification_name, transaction_description))
     con.commit()
     result = cur.fetchall()
     cur.close()

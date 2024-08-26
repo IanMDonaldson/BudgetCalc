@@ -50,7 +50,7 @@ def extract_ending_balance(text):
     return ending_balance
 
 
-# ['Date Posted', 'Transaction Name', 'Amount', 'Ending Balance']
+# ['Date Posted', 'Transaction Name', 'Amount', 'Ending Balance', 'Bank Type']
 def create_table(text):
     transaction_table = []
     ## required for

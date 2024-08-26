@@ -1,7 +1,31 @@
 import sqlite3
+import tkinter.messagebox
+from sys import exit
+
 from Consts import DATABASE
 from Utils.ParserUtils import clean_description
-#TODO change join statements to join on classification description and trans description instead of id :)
+
+
+def get_transaction_by_all(date, desc, amount, balance, btype):
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute("SELECT * from Transactions "
+                "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)", (date, desc, amount, balance, btype))
+    result = cur.fetchall()
+    if len(result) > 1:
+        tkinter.messagebox.showerror("Duplicate Transactions", "There are duplicate Transactions: " + str(result) + "\n Quitting!")
+        cur.close()
+        con.close()
+        sys.exit()
+    elif len(result) == 1:
+        row = result[0]
+        cur.close()
+        con.close()
+        return row
+    cur.close()
+    con.close()
+    return result
+
 
 def get_transactions():
     con = sqlite3.connect(DATABASE)
@@ -9,16 +33,17 @@ def get_transactions():
     cur.execute("SELECT * from Transactions")
     result = cur.fetchall()
     cur.close()
+    con.close()
     return result
 
 
 def get_transactions_by_date(date):
-    print(date)
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     cur.execute("SELECT * from Transactions where date = ?", (date,))
     result = cur.fetchall()
     cur.close()
+    con.close()
     return result
 
 
@@ -30,6 +55,7 @@ def insert_transactions(transactions):
     con.commit()
     result = cur.fetchall()
     cur.close()
+    con.close()
     return result
 
 
@@ -50,7 +76,7 @@ def insert_transaction(transaction):
 def get_transactions_between_dates(date1, date2):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
-    cur.execute("SELECT * from Transactions where date BETWEEN date(?) AND date(?)", (date1, date2))
+    cur.execute("SELECT * from Transactions t where t.date BETWEEN ? AND ?", (date1, date2))
     result = cur.fetchall()
     cur.close()
     con.close()
@@ -60,10 +86,12 @@ def get_transactions_between_dates(date1, date2):
 def get_transactions_and_classifications_between_dates(date1, date2):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
-    cur.execute("SELECT c.classification, t.date, t.description, t.amount, t.bank_type "
-                "FROM Transactions t "
-                "INNER JOIN Classification c on t.description = c.trans_description "
-                "WHERE t.date BETWEEN ? and ?", (date1, date2))
+    cur.execute('''select c.classification, t.transaction_id, t.date, t.description, t.amount, t.balance, t.bank_type
+        from Transactions t
+        JOIN Trans_Classification tc on t.transaction_id = tc.transaction_id
+        JOIN Classification c on tc.classification_id = c.classification_id
+        WHERE t.date between '03-01-2024' and '03-15-2024'
+        order by c.classification, t.date''', (date1, date2))
     results = cur.fetchall()
     cur.close()
     con.close()
@@ -73,11 +101,12 @@ def get_transactions_and_classifications_between_dates(date1, date2):
 def get_unique_classifications_and_count_between_dates(date1, date2):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
-    cur.execute("SELECT c.classification, count(c.classification) counter "
-        "FROM Transactions t "
-        "JOIN Classification c on t.transaction_id = c.classification_id "
-        "WHERE t.date between ? and ? "
-        "Group BY c.classification;", (date1, date2))
+    cur.execute('''select c.classification, count(c.classification) counter
+        from Transactions t
+        JOIN Trans_Classification tc on tc.transaction_id = t.transaction_id
+        JOIN Classification c on tc.classification_id = c.classification_id
+        WHERE t.date between ? AND ?
+        group by c.classification''', (date1, date2))
     results = cur.fetchall()
     cur.close()
     con.close()
@@ -87,11 +116,12 @@ def get_unique_classifications_and_count_between_dates(date1, date2):
 def get_transactions_by_classification_and_date(classification, begin_date, end_date):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
-    cur.execute("SELECT t.date, t.description, t.amount, t.bank_type "
-                "FROM Transactions t "
-                "JOIN Classification c on t.description = c.trans_description "
-                "WHERE t.date between ? and ? "
-                "AND c.classification = ?", (begin_date, end_date, classification))
+    cur.execute('''select *
+        from Transactions t
+        join Trans_Classification tc on tc.transaction_id = t.transaction_id
+        join Classification c on c.classification_id = tc.classification_id
+        where t.date between ? AND ? AND c.classification = ?
+        order by t.date''', (begin_date, end_date, classification))
     results = cur.fetchall()
     cur.close()
     con.close()

@@ -13,7 +13,6 @@ def main():
             handle_input(fileLocation)
             return
     else:
-        #todo convert to tkinter in droptest.py
         print("Nothing given as input")
         want_csv = input("Would you like to view a csv of stuff? (Y/N)")
         if want_csv == "Y":

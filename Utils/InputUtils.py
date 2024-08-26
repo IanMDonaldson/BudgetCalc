@@ -1,9 +1,4 @@
 # Go Between from DB and CSV
-
-'''todo add it to the database
-        if it's not already existing add it
-    todo create a csv for the month, or excel spreadsheet
-    todo classify transaction types'''
 from Parsers import (ArvestParser, TargetParser, UsBankParser, WellsFargoBankParser,
                      WellsFargoCreditCardParser, WellsFargoSavingsParser)
 from Repositories import TransactionRepository

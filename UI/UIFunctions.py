@@ -15,8 +15,6 @@ def create_label_and_input(root_elem, labelText):
     classEntry = ctk.CTkEntry(root_elem, width=50, height=25)
     classEntry.grid(row=3, column=1, padx=10)
 
-    #todo return entry value if exists
-
 
 def create_csv_inputs_hide_root(root_elem, row):
     img = ctk.CTkImage(light_image=Image.open('resources/img/calendar.png'),

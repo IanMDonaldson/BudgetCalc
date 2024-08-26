@@ -7,19 +7,6 @@ import customtkinter as ctk
 from UI import CalendarDialog, UIFunctions
 from Utils.InputUtils import handle_input
 
-#TODO handle Input
-#   2. Create Input for new Classifications
-#       - Create method creating new input fields
-#       - call it from input handler
-#   3.
-
-#todo make CSV_handler
-#   0. Use default dates to test normal functionality
-#   1. Make Datepickers for date range
-#   2. Populate input fields with that, otherwise allow for manual input of dates
-#   3. Pass these to handleCsv
-#   4.
-
 
 class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
     def __init__(self, *args, **kwargs):
@@ -85,7 +72,6 @@ def create_label_and_input(root_ui, labelText):
     classEntry = ctk.CTkEntry(root_ui, width=50, height=25)
     classEntry.grid(row=3, column=1, padx=10)
 
-    #todo return entry value if exists
 
 
 

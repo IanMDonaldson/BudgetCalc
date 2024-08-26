@@ -1,10 +1,12 @@
 import re
 from re import sub
+from sys import exit
 
 from pypdf import PdfReader
 import pypdfium2 as pdfium
 from decimal import Decimal
 from datetime import datetime
+from tkinter import messagebox
 
 months = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
           'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
@@ -62,8 +64,22 @@ def format_date(date):
     try:
         datetime.strptime(date, "%m-%d-%Y")
     except ValueError:
-        fixed_date = date + "-" + str(datetime.now().year)
-        return fixed_date
+        #Arvest and others don't have years on them, so add the year
+        #   If it's January and it's going to be about decembers stuff then this won't work.get date elsewhere..?
+        year_added_date = ''
+        if datetime.now().month == 1 and date[:2] == '12':
+            #add last year to date
+            year_added_date = date + "-" + str(datetime.now().year-1)
+        else:
+            year_added_date = date + "-" + str(datetime.now().year)
+        #now format to 0 padded
+        try:
+            dateobj = datetime.strptime(year_added_date, "%m-%d-%Y")
+            return datetime.strftime(dateobj, "%m-%d-%Y")
+        except ValueError:
+            # can't happen..but just in case..throw error and stop
+            messagebox.showerror("Invalid Date", "There was an invalid date during parse of pdf statements..Quitting")
+            sys.exit()
     return date
 
 
