@@ -1,10 +1,12 @@
 import re
 from tkinter import StringVar, TOP, RIGHT, LEFT, BOTTOM
 
+import UI.InputOptionBox
 import tkinterdnd2.TkinterDnD
 from tkinterdnd2 import TkinterDnD, DND_ALL, DND_FILES
 import customtkinter as ctk
 from UI import CalendarDialog, UIFunctions
+from UI.InputOptionBox import InputOptionBox
 from Utils.InputUtils import handle_input
 
 
@@ -12,6 +14,7 @@ class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.TkdndVersion = TkinterDnD._require(self)
+        UIFunctions.set_root(self)
 
         self.entryWidget = ctk.CTkEntry(self, width=100, height=100, placeholder_text='Drop Files Here')
         self.entryWidget.grid(row=1, column=3, padx=20)
@@ -23,12 +26,21 @@ class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
         self.pathLabel.grid(row=1, column=2, padx=20)
 
         self.generateCsvButton = ctk.CTkButton(self, text='Generate CSV?', width=50, height=30,
-                                          command=lambda: (self.hide_all_elems(),UIFunctions.create_csv_inputs_hide_root(self, 4)))
+                                          command=lambda: (self.hide_all_elems(),
+                                                           UIFunctions.create_csv_inputs_hide_root(self, 4)))
         self.generateCsvButton.grid(row=2, column=2, pady=50)
+
+
+        # self.classaddbutton= ctk.CTkButton(self, text="whatevr", width=30, height=30,
+        #                                    command=lambda: (UIFunctions.create_classification_input_dialog("DESCRIPTION")))
+        # self.classaddbutton.grid(row=3, column=2, pady=50)
 
 
         self.entryWidget.drop_target_register(DND_FILES)
         self.entryWidget.dnd_bind("<<Drop:DND_Files>>", get_path)
+
+        UIFunctions.set_root(self)
+
 
     def hide_all_elems(self):
         self.entryWidget.grid_remove()

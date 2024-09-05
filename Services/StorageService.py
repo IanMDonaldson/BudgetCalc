@@ -30,42 +30,45 @@ def create_classifications_from_transactions():
 
 
 def insert_transaction_and_classification(row):
-    # transaction_date, , amount, balance, banktype = row[0], row[1], row[2], row[3], row[4]
-    trans_date , trans_description , trans_amount, trans_balance, trans_banktype = row[0], row[1], row[2], row[3], row[4]
+    trans_date, trans_description, trans_amount, trans_balance, trans_banktype = row[0], row[1], row[2], row[3], row[4]
 
     transaction_row = []
     classification_rows = ClassificationRepository.get_classification_by_description(trans_description)
     if len(classification_rows) > 1:
         raise Exception("classification exists more than once, clean DB please", str(classification_rows))
-    # classification does NOT exist, need transaction ID
     elif len(classification_rows) == 0:
+        # classification does NOT exist, need transaction ID
         classification_name = UIFunctions.create_classification_input_dialog(trans_description)
-        stored_transaction = TransactionRepository.get_transaction_by_all(trans_date, trans_description, trans_amount, trans_balance, trans_banktype)
-        # If transaction already exists, just insert classification, otherwise we need to insert transaction to get transid
-        if stored_transaction:
-            inserted_classification_row = ClassificationRepository.insert_classification(
-                classification_name, trans_description)[0]
-            TransClassRepository.insert_trans_class(transaction_id=stored_transaction[0][0],
-                                                    class_id=inserted_classification_row[0])
-        else:
-            transaction_row = TransactionRepository.insert_transaction(row)[0]
-            classification_row = ClassificationRepository.insert_classification(UIFunctions.create_classification_input_dialog(trans_description),
-                                                                                trans_description)[0]
-            TransClassRepository.insert_trans_class(trans_id=transaction_row[0], class_id=classification_row[0])
+        # todo after balance check impl, If transaction already exists, just insert classification, otherwise we need to insert transaction to get transid
+        # stored_transaction = TransactionRepository.get_transaction_by_all(trans_date, trans_description,
+        #                                                                           trans_amount, trans_balance,
+        #                                                                           trans_banktype)
+        # if stored_transaction:
+        #     inserted_classification_row = ClassificationRepository.insert_classification(
+        #         classification_name, trans_description)[0]
+        #     TransClassRepository.insert_trans_class(transaction_id=stored_transaction[0][0],
+        #                                             class_id=inserted_classification_row[0])
+        # else:
+        inserted_transaction_row = TransactionRepository.insert_transaction(row)[0]
+        classification_row = ClassificationRepository.insert_classification(classification_name,
+                                                                            trans_description)[0]
+        TransClassRepository.insert_trans_class(trans_id=inserted_transaction_row[0],
+                                                class_id=classification_row[0])
     else:
-        # Classification exists, see if transaction exists
-        stored_transaction = TransactionRepository.get_transaction_by_all(trans_date, trans_description, trans_amount, trans_balance, trans_banktype)
         classification_row = classification_rows[0]
-
-        if stored_transaction:
-            #classification exists, transaction exists...now check if transclassrepo entry exists
-            if not TransClassRepository.does_trans_class_exist(trans_id=stored_transaction[0][0],
-                                                               class_id=classification_row[0]):
-                TransClassRepository.insert_trans_class(trans_id= stored_transaction[0][0],
-                                                        class_id= classification_row[0])
-        else:
-            # insert transaction, map the new transaction to the existing classification
-            inserted_transaction_row = TransactionRepository.insert_transaction(row)[0]
-            TransClassRepository.insert_trans_class(class_id= classification_row[0],
-                                                    trans_id= inserted_transaction_row[0])
+        # todo after balance check, Classification exists, see if transaction exists
+        # stored_transaction = TransactionRepository.get_transaction_by_all(trans_date, trans_description,
+        #                                                                   trans_amount, trans_balance,
+        #                                                                   trans_banktype)
+        # if stored_transaction:
+        #     #classification exists, transaction exists...now check if transclassrepo entry exists
+        #     if not TransClassRepository.does_trans_class_exist(trans_id=stored_transaction[0][0],
+        #                                                        class_id=classification_row[0]):
+        #         TransClassRepository.insert_trans_class(trans_id= stored_transaction[0][0],
+        #                                                 class_id= classification_row[0])
+        # else:
+        # insert transaction, map the new transaction to the existing classification
+        inserted_transaction_row = TransactionRepository.insert_transaction(row)[0]
+        TransClassRepository.insert_trans_class(trans_id= inserted_transaction_row[0],
+                                                class_id= classification_row[0])
     return

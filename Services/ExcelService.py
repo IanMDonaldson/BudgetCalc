@@ -37,17 +37,19 @@ def write_transactions_and_classification_to_sheet(
 ):
     worksheet.write(current_row, 0, classification)
     for transaction in transactions_by_classification:
-        if (('Online Transfer' in transaction[1])
-                or ('BILL PAY' in transaction[1])
-                or ('CARDMEMBER SERV WEB PYMT' in transaction[1])
-                or ('Zelle From Ian Donaldson' in transaction[1])
-                or ('ZELLE' in transaction[1])
-                or ('Rent' in transaction[1])):
+        date = transaction[1]
+        description = transaction[2]
+        amount = transaction[3]/100
+        banktype = transaction[5]
+
+        if (('Online Transfer' or 'BILL PAY' or 'CARDMEMBER SERV WEB PYMT' or 'Rent'
+                or 'Zelle From Ian Donaldson' or 'ZELLE')
+                in description):
             continue
-        worksheet.write(current_row, 1, transaction[0])
-        worksheet.write(current_row, 2, transaction[1])
-        worksheet.write(current_row, 3, transaction[3])
-        worksheet.write(current_row, 4, transaction[2]/100)
+        worksheet.write(current_row, 1, date)
+        worksheet.write(current_row, 2, description)
+        worksheet.write(current_row, 3, banktype)
+        worksheet.write(current_row, 4, amount)
         current_row += 1
 
 

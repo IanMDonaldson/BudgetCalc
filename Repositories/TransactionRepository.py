@@ -12,16 +12,16 @@ def get_transaction_by_all(date, desc, amount, balance, btype):
     cur.execute("SELECT * from Transactions "
                 "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)", (date, desc, amount, balance, btype))
     result = cur.fetchall()
-    if len(result) > 1:
-        tkinter.messagebox.showerror("Duplicate Transactions", "There are duplicate Transactions: " + str(result) + "\n Quitting!")
-        cur.close()
-        con.close()
-        sys.exit()
-    elif len(result) == 1:
-        row = result[0]
-        cur.close()
-        con.close()
-        return row
+    # if len(result) > 1:
+    #     tkinter.messagebox.showerror("Duplicate Transactions", "There are duplicate Transactions: " + str(result) + "\n Quitting!")
+    #     cur.close()
+    #     con.close()
+    #     sys.exit()
+    # elif len(result) == 1:
+    #     row = result[0]
+    #     cur.close()
+    #     con.close()
+    #     return row
     cur.close()
     con.close()
     return result

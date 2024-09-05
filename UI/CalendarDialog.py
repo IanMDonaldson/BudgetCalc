@@ -17,4 +17,4 @@ class CalendarDialog(simpledialog.Dialog):
 
 def create_elem(root):
     cd = CalendarDialog(root)
-    print(cd.result)
+    return cd.result
