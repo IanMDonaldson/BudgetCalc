@@ -1,0 +1,10 @@
+TODO calculate balances in the rare occasion that there exists two identical transaction descriptions, for the same amount on the same day
+    Like sending 10 dollars to multiple people on Zelle because we cut the description down to non-unique values :)
+    TODO Could get around this by storing the raw descriptions in the Transaction Table
+        Then when inserting into the Classification Table we run it through the clean description function!..seems like a better solution..don't really wanna determine balance unless I want
+        to have a function to check whether the DB matches the statements
+            - To check whether the DB matches the statement balances, we would have to determine the bank transfers and payments from checking/CC or transfers from checking/Savings..
+
+
+todo close program and open the excel sheet after generating csv
+todo output to google sheets
