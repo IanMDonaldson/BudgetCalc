@@ -20,37 +20,38 @@ def create_xl_from_dates(begin_date, end_date):
         if len(transactions_by_classification) != counter:
             raise Exception("number of transactions for classification doesn't match the transaction count function")
             break
-        write_transactions_and_classification_to_sheet(worksheet, transactions_by_classification,
+        end_row = write_transactions_and_classification_to_sheet(worksheet, transactions_by_classification,
                                                        classification, counter, row)
-        end_row = row+counter
-        worksheet.write(end_row, 3, 'TOTAL this Classification')
-        worksheet.write(end_row, 4, '=SUM(E{start_row}:E{current_row})'.format(start_row=row+1, current_row=end_row))
-        sums.append('E{num}'.format(num=end_row+1))
-        row += counter + 2
+        if end_row != row:
+            worksheet.write(end_row, 3, 'TOTAL this Classification')
+            worksheet.write(end_row, 4, '=SUM(E{start_row}:E{current_row})'.format(start_row=row+1, current_row=end_row))
+            sums.append('E{num}'.format(num=end_row+1))
+            row = end_row + 2
     worksheet.write(row+2, 0, 'Total This Month')
     worksheet.write(row+2, 1, '=SUM('+','.join([str(x) for x in sums])+')')
     workbook.close()
 
 
-def write_transactions_and_classification_to_sheet(
-        worksheet, transactions_by_classification, classification, count, current_row
-):
-    worksheet.write(current_row, 0, classification)
+def write_transactions_and_classification_to_sheet(worksheet, transactions_by_classification,
+                   classification, count, current_row):
+    newrow = current_row
+    worksheet.write(newrow, 0, classification)
     for transaction in transactions_by_classification:
         date = transaction[1]
-        description = transaction[2]
+        description = transaction[2].strip()
         amount = transaction[3]/100
         banktype = transaction[5]
 
-        if (('Online Transfer' or 'BILL PAY' or 'CARDMEMBER SERV WEB PYMT' or 'Rent'
-                or 'Zelle From Ian Donaldson' or 'ZELLE')
-                in description):
+        if (('Online Transfer' in description) or ('BILL PAY' in description) or
+            ('CARDMEMBER SERV WEB PYMT' in description) or ('Rent' in description) or
+             ('Zelle From Ian Donaldson' in description) or ('ZELLE' in description)):
             continue
-        worksheet.write(current_row, 1, date)
-        worksheet.write(current_row, 2, description)
-        worksheet.write(current_row, 3, banktype)
-        worksheet.write(current_row, 4, amount)
-        current_row += 1
+        worksheet.write(newrow, 1, date)
+        worksheet.write(newrow, 2, description)
+        worksheet.write(newrow, 3, banktype)
+        worksheet.write(newrow, 4, amount)
+        newrow += 1
+    return newrow
 
 
 def write_total(worksheet, start_row, current_row):
