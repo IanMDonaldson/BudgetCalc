@@ -6,6 +6,7 @@ import re
 
 #['Date Posted', 'Transaction Name', 'Amount', 'Balance', 'BankType']
 def extractLines(text):
+    sum = 0
     transactions = []
     regex = r"(\D{3}\. \d\d)((?<= \d\d)(.*)(?=\$))(\$.+)"
     matches = re.finditer(regex, text, re.MULTILINE)
@@ -13,7 +14,8 @@ def extractLines(text):
         post_date = format_date(abbr_to_month(match.group(1)[:7].replace(". ",'/')))
         name = clean_description(match.group(3))
         amount = -convert_currency_to_int(match.group(4))
-        transactions.append([post_date, name, amount, '', 'Target'])
+        sum += amount
+        transactions.append([post_date, name, amount, sum, 'Target'])
     return sorted(transactions, key=lambda transaction: transaction[0])
 
 

@@ -9,10 +9,10 @@ import re
 
 # ['Date Posted', 'Transaction Name', 'Amount', 'Balance']
 def extractLines(filename):
-    transactions = get_transactions_text(filename)
+    (transactions, sum) = get_transactions_text(filename)
 
     if credits_exist(filename):
-        card_credits = append_credits(filename)
+        card_credits = append_credits(filename, sum)
         for credit in card_credits:
             transactions.append(credit)
 
@@ -26,18 +26,20 @@ def get_transactions_text(filename):
     for page in pdf.pages[3:5]:
         text += page.extract_text()
     transactions = []
+    sum = 0
     regex = r"(\d\d\/\d\d)(?: \d\d\/\d\d \d\d\d\d )([^\n]*)(?:\$)([\d{1,3}|(?:\,)]+(?:\.)\d\d)|(\d\d\/\d\d)(?: \d\d\/\d\d \d\d\d\d )([^\n]+).+\n.+\n.+\n.+\n(?:\$)([\d{1,3}|(?:\,)]+(?:\.)\d\d\n)"
     matches = re.finditer(regex, text, flags=re.MULTILINE)
     for matchNum, match in enumerate(matches, start=0):
         post_date = format_date(match.group(1)[:5])
         name = clean_description(match.group(2))
-        amount = convert_currency_to_int(match.group(3))
-        transactions.append([post_date, name, -amount, '', 'USBank'])
+        amount = -convert_currency_to_int(match.group(3))
+        sum += amount
+        transactions.append([post_date, name, amount, sum, 'USBank'])
 
-    return transactions
+    return (transactions, sum)
 
 
-def append_credits(filename):
+def append_credits(filename, sum):
     card_credits = []
     pdf = pdfplumber.open(filename)
 
@@ -65,7 +67,8 @@ def append_credits(filename):
                 continue
             post_date = format_date(match.group(1)[:7])
             amount = convert_currency_to_int(match.group(3))
-            card_credits.append([post_date, name, amount, '', 'WFCard'])
+            sum += amount
+            card_credits.append([post_date, name, amount, sum, 'WFCard'])
         else:
             print(match.group(1))
             print(match.group(2))

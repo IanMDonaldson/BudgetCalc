@@ -12,10 +12,6 @@ def extract_begin_balance(text):
     date = format_date(match.group(1))
     desc = clean_description(match.group(2))
     return convert_currency_to_int(match.group(3))
-    # global beginning_balance_amount
-    # beginning_balance_amount = convert_currency_to_int(match.group(3))
-    # begin_bal_row = [date, desc, '', beginning_balance_amount, 'Arvest']
-    # return begin_bal_row
 
 
 def extract_transactions(text):

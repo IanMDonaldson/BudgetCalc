@@ -1,9 +1,17 @@
-TODO calculate balances in the rare occasion that there exists two identical transaction descriptions, for the same amount on the same day
-    Like sending 10 dollars to multiple people on Zelle because we cut the description down to non-unique values :)
-    TODO Could get around this by storing the raw descriptions in the Transaction Table
-        Then when inserting into the Classification Table we run it through the clean description function!..seems like a better solution..don't really wanna determine balance unless I want
-        to have a function to check whether the DB matches the statements
-            - To check whether the DB matches the statement balances, we would have to determine the bank transfers and payments from checking/CC or transfers from checking/Savings..
+If we use a simple sum to stop inserting the same pdf twice
+    - same pdf - sum will work because the pdf is the exact same
+    - different pdf (new month)
+        - chance of the first entry of the new pdf matching the desription, date, amount, and balance of the first entry of the old
+            is impossible since they're a month apart, they can though
+            have the same amount, balance, description, but not the date so we're good there
+TODO add functions in the Database Insertion functions to check if the values in the provided
+    pdf-extracted table match those in the table from the database query
+
+TODO need to update every single transaction with the new sum
+TODO Store the non-clean description in the transaction table, while cleaning it in the trans-class and class tables
+    - to get more fine grained description output and more unique descriptions to validate if same pdf inserted twice
+
+
 
 
 todo close program and open the excel sheet after generating csv
