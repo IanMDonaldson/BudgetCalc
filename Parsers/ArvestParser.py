@@ -49,7 +49,6 @@ def extract_ending_balance(text):
 # ['Date Posted', 'Transaction Name', 'Amount', 'Ending Balance', 'Bank Type']
 def create_table(text):
     transaction_table = []
-    ## required for
     beginning_balance = extract_begin_balance(text)
     transaction_list = extract_transactions(text)
     ending_balance = extract_ending_balance(text)

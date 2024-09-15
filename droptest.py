@@ -10,6 +10,8 @@ from UI.InputOptionBox import InputOptionBox
 from Utils.InputUtils import handle_input
 
 
+filename = ""
+
 class Tk(ctk.CTk, TkinterDnD.DnDWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,6 +60,8 @@ def buttonEvent():
     print(files)
     for file in files:
         print('file below' + str(file) + '\n\n')
+        global filename
+        filename = str(file)
         handle_input(file)
 
 def get_path(events: TkinterDnD.DnDEvent):
@@ -74,6 +78,8 @@ def get_path(events: TkinterDnD.DnDEvent):
 
     # print(file_arr)
     for file_string in file_arr:
+        global filename
+        filename = file_string
         handle_input(file_string)
 
 

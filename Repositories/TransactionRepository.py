@@ -1,30 +1,53 @@
 import sqlite3
 import tkinter.messagebox
 from sys import exit
-
+# from droptest import filename
 from Consts import DATABASE
 from Utils.ParserUtils import clean_description
 
 
 def get_transaction_by_all(date, desc, amount, balance, btype):
+    transByNoBal = sorted(get_transactions_by_all_but_balance(date, desc, amount, btype), key=lambda transaction: transaction[0])
+    if len(transByNoBal) > 1:
+        #now multiple transactions on the same day...just sort by transaction ID and we should just be able to insert the
+        #   balance and be sure it's inserted earlier than the next one but debug just to be sure
+        for trans in transByNoBal:
+            update_transaction(trans[0], balance)
+    elif len(transByNoBal) == 1:
+        update_transaction(transByNoBal[0][0], balance)
+    else:
+        con = sqlite3.connect(DATABASE)
+        cur = con.cursor()
+        cur.execute("SELECT * from Transactions "
+                    "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)", (date, desc, amount, balance, btype))
+        result = cur.fetchall()
+        if len(result) > 1:
+            tkinter.messagebox.showerror('''Duplicate Transactions", "There are duplicate Transactions:
+            {result}
+            for filename {filename}'''.format(str(result), filename))
+            cur.close()
+            con.close()
+            return -1
+        elif len(result) == 1:
+            row = result[0]
+            cur.close()
+            con.close()
+            return row
+        cur.close()
+        con.close()
+        return result#will be none
+
+
+def get_transactions_by_all_but_balance(date, desc, amount, btype):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     cur.execute("SELECT * from Transactions "
-                "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)", (date, desc, amount, balance, btype))
+                "WHERE (date, description, amount, bank_type) = (?, ?, ?, ?) AND balance is null", (date, desc, amount, btype))
     result = cur.fetchall()
-    # if len(result) > 1:
-    #     tkinter.messagebox.showerror("Duplicate Transactions", "There are duplicate Transactions: " + str(result) + "\n Quitting!")
-    #     cur.close()
-    #     con.close()
-    #     sys.exit()
-    # elif len(result) == 1:
-    #     row = result[0]
-    #     cur.close()
-    #     con.close()
-    #     return row
     cur.close()
     con.close()
-    return result
+    return result#will be none
+
 
 
 def get_transactions():
@@ -160,6 +183,18 @@ def check_unique():
     return results
 
 
+def update_transaction(id, balance):
+    con = sqlite3.connect(DATABASE)
+    cur = con.cursor()
+    cur.execute('''UPDATE Transactions
+    SET balance = ?
+    WHERE transaction_id = ?''', (balance, id))
+    con.commit()
+    cur.close()
+    con.close()
 
-# cleanup_descriptions()
-# check_unique()
+# get_transaction_by_all('06-20-2024', 'CMSVENDCV ', -260, 0, 'USBank')
+# get_transaction_by_all('06-20-2024', 'CMSVENDCV ', -260, -260, 'USBank')
+# get_transaction_by_all('02-20-2024', 'Zelle to Matthew on Photos', -9500, 216871, 'WFBank')
+# get_transaction_by_all(date, desc, amount, balance, btype)
+# get_transaction_by_all(date, desc, amount, balance, btype)

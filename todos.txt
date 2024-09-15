@@ -8,6 +8,13 @@ TODO add functions in the Database Insertion functions to check if the values in
     pdf-extracted table match those in the table from the database query
 
 TODO need to update every single transaction with the new sum
+    - Feb
+    March 0
+    April 1
+    May 1
+    June 1
+    July
+
 TODO Store the non-clean description in the transaction table, while cleaning it in the trans-class and class tables
     - to get more fine grained description output and more unique descriptions to validate if same pdf inserted twice
 
