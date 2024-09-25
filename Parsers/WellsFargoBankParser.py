@@ -1,4 +1,3 @@
-import tabulate
 import pdfplumber
 
 from Utils.ParserUtils import format_date, convert_currency_to_intstr, clean_description

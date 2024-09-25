@@ -1,6 +1,6 @@
-import tabulate
-from Utils.ParserUtils import return_pages_text_pdfium, convert_currency_to_int, format_date, clean_description
 import re
+
+from Utils.ParserUtils import return_pages_text_pdfium, convert_currency_to_int, format_date, clean_description
 
 
 # ['Date Posted', 'Transaction Name', 'Amount', 'Balance', 'Bank Type']
@@ -38,7 +38,7 @@ def extract_credits(text, sum):
     while i < text_length:
         match = re.findall(r'(Other Credits)(?! \$[\d{1,3}|(?:\,)]+(?:\.)\d\d)', lines[i])
         if match and '$0.00' not in lines[i]:
-            for j in range(i+1, text_length):
+            for j in range(i + 1, text_length):
                 if 'CREDITS FOR THIS PERIOD' in str(lines[j]):
                     break
                 extracted_lines += lines[j] + "\n"
@@ -57,7 +57,6 @@ def extract_credits(text, sum):
         card_credits.append([post_date, name, amount, sum, 'WFCard'])
 
     return card_credits, sum
-
 
 
 def extract_credit_card_lines_test(filename):
@@ -82,7 +81,3 @@ def extract_credit_card_lines_test(filename):
 # print(tabulate.tabulate(extract_credit_card_lines_test("C:\\Users\\drago\\Downloads\\MayWellsFargo.pdf")))
 # print(tabulate.tabulate(extract_credit_card_lines_test("C:\\Users\\drago\\Downloads\\AprilWellsFargo.pdf")))
 # print(tabulate.tabulate(extract_credit_card_lines_test("C:\\Users\\drago\\Downloads\\MarchWellsFargo.pdf")))
-
-
-
-

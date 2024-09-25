@@ -1,25 +1,28 @@
 import sqlite3
 import tkinter.messagebox
-from sys import exit
-# from droptest import filename
+
 from Consts import DATABASE
 from Utils.ParserUtils import clean_description
 
 
 def get_transaction_by_all(date, desc, amount, balance, btype):
-    transByNoBal = sorted(get_transactions_by_all_but_balance(date, desc, amount, btype), key=lambda transaction: transaction[0])
+    transByNoBal = sorted(get_transactions_where_balance_null(date, desc, amount, btype),
+                          key=lambda transaction: transaction[0])
     if len(transByNoBal) > 1:
-        #now multiple transactions on the same day...just sort by transaction ID and we should just be able to insert the
+        # now multiple transactions on the same day...just sort by transaction ID and we should just be able to insert the
         #   balance and be sure it's inserted earlier than the next one but debug just to be sure
         for trans in transByNoBal:
-            update_transaction(trans[0], balance)
+            result = update_transaction(trans[0], balance)
+            return result[0]
     elif len(transByNoBal) == 1:
-        update_transaction(transByNoBal[0][0], balance)
+        result = update_transaction(transByNoBal[0][0], balance)
+        return result[0]
     else:
         con = sqlite3.connect(DATABASE)
         cur = con.cursor()
         cur.execute("SELECT * from Transactions "
-                    "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)", (date, desc, amount, balance, btype))
+                    "WHERE (date, description, amount, balance, bank_type) = (?, ?, ?, ?, ?)",
+                    (date, desc, amount, balance, btype))
         result = cur.fetchall()
         if len(result) > 1:
             tkinter.messagebox.showerror('''Duplicate Transactions", "There are duplicate Transactions:
@@ -35,19 +38,19 @@ def get_transaction_by_all(date, desc, amount, balance, btype):
             return row
         cur.close()
         con.close()
-        return result#will be none
+        return result  # will be empty array
 
 
-def get_transactions_by_all_but_balance(date, desc, amount, btype):
+def get_transactions_where_balance_null(date, desc, amount, btype):
     con = sqlite3.connect(DATABASE)
     cur = con.cursor()
     cur.execute("SELECT * from Transactions "
-                "WHERE (date, description, amount, bank_type) = (?, ?, ?, ?) AND balance is null", (date, desc, amount, btype))
+                "WHERE (date, description, amount, bank_type) = (?, ?, ?, ?) AND (balance is null OR balance = '')",
+                (date, desc, amount, btype))
     result = cur.fetchall()
     cur.close()
     con.close()
-    return result#will be none
-
+    return result  # will be none
 
 
 def get_transactions():
@@ -150,6 +153,7 @@ def get_transactions_by_classification_and_date(classification, begin_date, end_
     con.close()
     return results
 
+
 # Don't use, only for fixing and debugging stuff
 def cleanup_descriptions():
     con = sqlite3.connect(DATABASE)
@@ -188,10 +192,13 @@ def update_transaction(id, balance):
     cur = con.cursor()
     cur.execute('''UPDATE Transactions
     SET balance = ?
-    WHERE transaction_id = ?''', (balance, id))
+    WHERE transaction_id = ?
+    RETURNING *''', (balance, id))
+    result = cur.fetchall()
     con.commit()
     cur.close()
     con.close()
+    return result
 
 # get_transaction_by_all('06-20-2024', 'CMSVENDCV ', -260, 0, 'USBank')
 # get_transaction_by_all('06-20-2024', 'CMSVENDCV ', -260, -260, 'USBank')

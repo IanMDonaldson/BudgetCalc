@@ -1,8 +1,6 @@
+import sys
 import tkinter as ttk
 from tkinter import messagebox
-import sys
-import tkinter.dialog
-from PIL.ImageTk import PhotoImage
 
 import Repositories.ClassificationRepository as classrepo
 
@@ -11,7 +9,7 @@ class InputOptionBox(ttk.Frame):
 
     def __init__(self, master, description):
         super().__init__(master)
-        top=self.top=ttk.Toplevel(master)
+        top = self.top = ttk.Toplevel(master)
 
         self.description = description
 
@@ -38,16 +36,15 @@ class InputOptionBox(ttk.Frame):
         cancelbutton = ttk.Button(top, text="Cancel", command=lambda: (sys.exit()))
         cancelbutton.pack()
 
-
     def OKButtonPressed(self):
 
         # try:
-        if ((len(self.entryfield.get()) == 0 and self.selectedValue.get() == "Select an Option") or (len(self.entryfield.get()) != 0 and self.selectedValue.get() != "Select an Option")):
+        if ((len(self.entryfield.get()) == 0 and self.selectedValue.get() == "Select an Option") or (
+                len(self.entryfield.get()) != 0 and self.selectedValue.get() != "Select an Option")):
             messagebox.showwarning(title="Only one field can be set", message="Only one field can be set")
             self.top.lift()
         else:
             self.exit_popup()
-
 
     def exit_popup(self):
         self.top.destroy()

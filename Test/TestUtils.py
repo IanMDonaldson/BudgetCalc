@@ -1,6 +1,6 @@
-from mock_db import MockDB
-from mock import patch
 import utils
+from mock_db import MockDB
+
 
 class TestUtils(MockDB):
 

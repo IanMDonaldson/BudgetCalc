@@ -1,5 +1,6 @@
-from Utils.ParserUtils import calculate_amount, convert_currency_to_int, format_date, clean_description
 import re
+
+from Utils.ParserUtils import calculate_amount, convert_currency_to_int, format_date, clean_description
 
 final_transaction_balance = -1
 

@@ -1,9 +1,9 @@
-from unittest import TestCase
 import sqlite3
-from mock import patch
+from unittest import TestCase
+
 import utils
 from Consts import DATABASE
-
+from mock import patch
 
 
 class MockDB(TestCase):
@@ -57,7 +57,7 @@ class MockDB(TestCase):
         cur.close()
         con.close()
 
-        testconfig ={
+        testconfig = {
             'host': MYSQL_HOST,
             'user': MYSQL_USER,
             'password': MYSQL_PASSWORD,
@@ -67,7 +67,7 @@ class MockDB(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        con= sqlite3.connect(DATABASE)
+        con = sqlite3.connect(DATABASE)
         cur = con.cursor(dictionary=True)
 
         # drop test database

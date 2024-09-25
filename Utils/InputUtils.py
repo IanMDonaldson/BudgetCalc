@@ -2,9 +2,9 @@
 from Parsers import (ArvestParser, TargetParser, UsBankParser, WellsFargoBankParser,
                      WellsFargoCreditCardParser, WellsFargoSavingsParser)
 from Repositories import TransactionRepository
-from Utils.ParserUtils import return_pages_text_pdfium, return_text_for_all_pages
-from Utils.DatabaseUtils import insert_helper
 from Services import ExcelService
+from Utils.DatabaseUtils import insert_helper
+from Utils.ParserUtils import return_pages_text_pdfium, return_text_for_all_pages
 
 
 def handle_input(filename):
@@ -15,7 +15,7 @@ def handle_input(filename):
         if not insert_helper(table, TransactionRepository):
             return
     elif "PORTIONWITHYOURPAYMENTMADEPAYBLETOTARGETCARDSERVICE" in pdfium_text:
-        table = TargetParser.extractLines(pdfium_text)
+        table = TargetParser.extractLines(filename)
         if not insert_helper(table, TransactionRepository):
             return
     elif "U.S. Bank National Association" in pdfium_text:
@@ -36,7 +36,8 @@ def handle_input(filename):
             return
     else:
         raise Exception("Statement Type Not Found")
-    return "Success for filename: {filename}".format(filename)
+    return "Success for filename: {filename}".format(filename=filename)
+
 
 def handle_csv():
     start_date = input("What would you like the start date to be: ")

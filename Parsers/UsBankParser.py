@@ -1,10 +1,7 @@
-import pypdfium2
-import tabulate
-import pdfplumber
-from Utils.ParserUtils import return_text_for_all_pages, format_date, convert_currency_to_int, clean_description, \
-    return_pages_text_pdfium
-import pypdfium2 as pdfium
 import re
+
+import pdfplumber
+from Utils.ParserUtils import format_date, convert_currency_to_int, clean_description
 
 
 # ['Date Posted', 'Transaction Name', 'Amount', 'Balance']
@@ -88,7 +85,6 @@ def credits_exist(filename):
     if match and '$0.00' not in match:
         return True
     return False
-
 
 # print(tabulate.tabulate(extractLines('C:\\Users\\drago\\Downloads\\usbankMay.pdf')))
 # print(tabulate.tabulate(extractLines('C:\\Users\\drago\\Downloads\\usbankApril.pdf')))
