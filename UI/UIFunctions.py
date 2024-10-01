@@ -19,8 +19,8 @@ def create_label_and_input(root_elem, labelText):
 
 
 def create_csv_inputs_hide_root(root_elem, row):
-    img = ctk.CTkImage(light_image=Image.open('resources/img/calendar.png'),
-                       dark_image=Image.open('resources/img/calendar.png'),
+    img = ctk.CTkImage(light_image=Image.open('C:/Users/drago/IdeaProjects/pythonBudgetCalculator2/resources/img/calendar.png'),
+                       dark_image=Image.open('C:/Users/drago/IdeaProjects/pythonBudgetCalculator2/resources/img/calendar.png'),
                        size=(20, 20))
     beginDateString = tkinter.StringVar(value='')
     endDateString = tkinter.StringVar(value='')

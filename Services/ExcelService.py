@@ -1,5 +1,6 @@
 import xlsxwriter
 from Repositories import TransactionRepository
+import Services.GoogleSheetsService as gservice
 
 
 def create_xl_from_dates(begin_date, end_date):
@@ -7,7 +8,7 @@ def create_xl_from_dates(begin_date, end_date):
                                  .get_unique_classifications_and_count_between_dates(begin_date, end_date))
     # transaction_entries = TransactionRepository.get_transactions_and_classifications_between_dates(begin_date, end_date)
     workbook = xlsxwriter.Workbook(
-        'ExpensesFrom{date1}-to-{date2}.xlsx'.format(date1=begin_date, date2=end_date)
+        'C:\\Users\\drago\\Downloads\\ExpensesFrom{date1}-to-{date2}.xlsx'.format(date1=begin_date, date2=end_date)
     )
     worksheet = workbook.add_worksheet('Expenses')
     create_header(worksheet, "Classification", 'Date', 'Description', 'Bank Type', 'Amount')
@@ -30,7 +31,9 @@ def create_xl_from_dates(begin_date, end_date):
             row = end_row + 2
     worksheet.write(row + 2, 0, 'Total This Month')
     worksheet.write(row + 2, 1, '=SUM(' + ','.join([str(x) for x in sums]) + ')')
+    worksheet.autofit()
     workbook.close()
+    gservice.upload(workbook)
 
 
 def write_transactions_and_classification_to_sheet(worksheet, transactions_by_classification,
@@ -46,7 +49,8 @@ def write_transactions_and_classification_to_sheet(worksheet, transactions_by_cl
         if (('Online Transfer' in description) or ('BILL PAY' in description) or
                 ('CARDMEMBER SERV WEB PYMT' in description) or ('Rent' in description) or
                 ('Zelle From Ian Donaldson' in description) or ('ZELLE' in description) or
-                ('EPAYMENTTARGET' in description) or ('AUTOPAYMENT' in description)):
+                ('EPAYMENTTARGET' in description) or ('AUTOPAYMENT' in description) or
+                ('Mobile Deposit Number' in description)):
             continue
         worksheet.write(newrow, 1, date)
         worksheet.write(newrow, 2, description)
@@ -59,18 +63,6 @@ def write_transactions_and_classification_to_sheet(worksheet, transactions_by_cl
 def write_total(worksheet, start_row, current_row):
     worksheet.write(current_row, 4,
                     '=SUM(E{start_row}:E{current_row})'.format(start_row=start_row, current_row=current_row))
-    # create_header(worksheet, "Classification", "Date", "description", "Amount", "Bank")
-    # for transaction in transaction_entries:
-    #     worksheet.write(row, col, transaction[4])
-    #     worksheet.write(row, col + 1, transaction[0])
-    #     worksheet.write(row, col + 2, transaction[1])
-    #     worksheet.write(row, col + 3, transaction[2])
-    #     worksheet.write(row, col + 4, transaction[3])
-    #     col = 0
-    #     row += 1
-    # worksheet.write(row, 2, "=SUM(D:{lastrow}".format(lastrow=row - 1))
-    # workbook.close()
-    # return workbook
 
 
 def create_header(worksheet, *args):
@@ -80,5 +72,5 @@ def create_header(worksheet, *args):
         worksheet.write(row, col, arg)
         col += 1
 
-# create_xl_from_dates("04-05-2024", "05-05-2024")
+# create_xl_from_dates("06-01-2024", "07-01-2024")
 # print(create_xl_from_dates("04-15-2024", "05-15-2024"))

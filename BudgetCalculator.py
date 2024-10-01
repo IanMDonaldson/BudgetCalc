@@ -1,3 +1,6 @@
+# nuitka-project: --enable-plugin=tk-inter
+#
+
 import re
 
 import customtkinter as ctk
