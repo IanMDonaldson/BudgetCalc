@@ -1,18 +1,15 @@
-import pypdfium2
-import tabulate
-import pdfplumber
-from Utils.ParserUtils import return_text_for_all_pages, format_date, convert_currency_to_int, clean_description, \
-    return_pages_text_pdfium
-import pypdfium2 as pdfium
 import re
+
+import pdfplumber
+from Utils.ParserUtils import format_date, convert_currency_to_int, clean_description
 
 
 # ['Date Posted', 'Transaction Name', 'Amount', 'Balance']
 def extractLines(filename):
-    transactions = get_transactions_text(filename)
+    (transactions, sum) = get_transactions_text(filename)
 
     if credits_exist(filename):
-        card_credits = append_credits(filename)
+        card_credits = append_credits(filename, sum)
         for credit in card_credits:
             transactions.append(credit)
 
@@ -26,18 +23,20 @@ def get_transactions_text(filename):
     for page in pdf.pages[3:5]:
         text += page.extract_text()
     transactions = []
+    sum = 0
     regex = r"(\d\d\/\d\d)(?: \d\d\/\d\d \d\d\d\d )([^\n]*)(?:\$)([\d{1,3}|(?:\,)]+(?:\.)\d\d)|(\d\d\/\d\d)(?: \d\d\/\d\d \d\d\d\d )([^\n]+).+\n.+\n.+\n.+\n(?:\$)([\d{1,3}|(?:\,)]+(?:\.)\d\d\n)"
     matches = re.finditer(regex, text, flags=re.MULTILINE)
     for matchNum, match in enumerate(matches, start=0):
         post_date = format_date(match.group(1)[:5])
         name = clean_description(match.group(2))
-        amount = convert_currency_to_int(match.group(3))
-        transactions.append([post_date, name, -amount, '', 'USBank'])
+        amount = -convert_currency_to_int(match.group(3))
+        sum += amount
+        transactions.append([post_date, name, amount, sum, 'USBank'])
 
-    return transactions
+    return (transactions, sum)
 
 
-def append_credits(filename):
+def append_credits(filename, sum):
     card_credits = []
     pdf = pdfplumber.open(filename)
 
@@ -65,7 +64,8 @@ def append_credits(filename):
                 continue
             post_date = format_date(match.group(1)[:7])
             amount = convert_currency_to_int(match.group(3))
-            card_credits.append([post_date, name, amount, '', 'WFCard'])
+            sum += amount
+            card_credits.append([post_date, name, amount, sum, 'WFCard'])
         else:
             print(match.group(1))
             print(match.group(2))
@@ -85,7 +85,6 @@ def credits_exist(filename):
     if match and '$0.00' not in match:
         return True
     return False
-
 
 # print(tabulate.tabulate(extractLines('C:\\Users\\drago\\Downloads\\usbankMay.pdf')))
 # print(tabulate.tabulate(extractLines('C:\\Users\\drago\\Downloads\\usbankApril.pdf')))

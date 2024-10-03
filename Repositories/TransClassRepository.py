@@ -1,6 +1,7 @@
 import sqlite3
+
 from Consts import DATABASE
-from Utils.ParserUtils import clean_description
+
 
 def insert_trans_class(trans_id, class_id):
     conn = sqlite3.connect(DATABASE)
@@ -48,6 +49,7 @@ def update_transaction_id(trans_id, class_id):
     cur.close()
     conn.close()
 
+
 def does_trans_class_exist(trans_id, class_id):
     conn = sqlite3.connect(DATABASE)
     cur = conn.cursor()
@@ -61,4 +63,3 @@ def does_trans_class_exist(trans_id, class_id):
     cur.close()
     conn.close()
     return False
-

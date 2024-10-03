@@ -1,4 +1,5 @@
 import sqlite3
+
 from Consts import DATABASE
 from Utils.ParserUtils import clean_description
 
@@ -96,5 +97,3 @@ def cap_class():
     cur.close()
     con.close()
     return result
-
-

@@ -1,4 +1,3 @@
-import tabulate
 import pdfplumber
 from Utils.ParserUtils import convert_currency_to_intstr, format_date, clean_description
 
@@ -6,10 +5,11 @@ from Utils.ParserUtils import convert_currency_to_intstr, format_date, clean_des
 # ['Date Posted', 'Transaction Name', 'Deposits', 'Withdrawals', 'Balance']
 def create_table(filename):
     transactions = []
+    prev_balance = 0
     pdf = pdfplumber.open(filename)
     page = pdf.pages[1]
-    crop_page = page.within_bbox((0, page.height*0.17, page.width, 0.5*float(page.height)))
-    table = crop_page.extract_table({"explicit_vertical_lines":[60, 100,400,470,526, 565]})
+    crop_page = page.within_bbox((0, page.height * 0.17, page.width, 0.5 * float(page.height)))
+    table = crop_page.extract_table({"explicit_vertical_lines": [60, 100, 400, 470, 526, 565]})
     for row in table:
         if 'Ending bal' in row[0]:
             break
@@ -19,16 +19,21 @@ def create_table(filename):
         withdrawal = convert_currency_to_intstr(row[3])
         balance = convert_currency_to_intstr(row[4])
         if deposit:
+            if balance:
+                prev_balance = balance
+            else:
+                balance = int(prev_balance) + int(deposit)
+                prev_balance = balance
             transactions.append([date, description, deposit, balance, 'WFSavings'])
         else:
-            transactions.append([date,description, "-"+withdrawal, balance, "WFSavings"])
+            if balance:
+                prev_balance = balance
+            else:
+                balance = int(prev_balance) - int(withdrawal)
+                prev_balance = balance
+            transactions.append([date, description, "-" + withdrawal, balance, 'WFSavings'])
 
     return sorted(transactions, key=lambda transaction: transaction[0])
-
-
-
-
-
 
 # print(tabulate.tabulate(create_table('C:\\Users\\drago\\Downloads\\marchLaurenSavings.pdf')))
 # print(tabulate.tabulate(create_table('C:\\Users\\drago\\Downloads\\AprilLaurenSavings.pdf')))

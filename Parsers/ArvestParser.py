@@ -1,5 +1,6 @@
-from Utils.ParserUtils import calculate_amount, convert_currency_to_int, format_date, clean_description
 import re
+
+from Utils.ParserUtils import calculate_amount, convert_currency_to_int, format_date, clean_description
 
 final_transaction_balance = -1
 
@@ -12,10 +13,6 @@ def extract_begin_balance(text):
     date = format_date(match.group(1))
     desc = clean_description(match.group(2))
     return convert_currency_to_int(match.group(3))
-    # global beginning_balance_amount
-    # beginning_balance_amount = convert_currency_to_int(match.group(3))
-    # begin_bal_row = [date, desc, '', beginning_balance_amount, 'Arvest']
-    # return begin_bal_row
 
 
 def extract_transactions(text):
@@ -53,7 +50,6 @@ def extract_ending_balance(text):
 # ['Date Posted', 'Transaction Name', 'Amount', 'Ending Balance', 'Bank Type']
 def create_table(text):
     transaction_table = []
-    ## required for
     beginning_balance = extract_begin_balance(text)
     transaction_list = extract_transactions(text)
     ending_balance = extract_ending_balance(text)
